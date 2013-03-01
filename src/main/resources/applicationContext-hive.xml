@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:util="http://www.springframework.org/schema/util" xmlns:hadoop="http://www.springframework.org/schema/hadoop"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+    http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+
+
+  <bean id="hiveTemplate" class="org.projectx.hive.HiveTemplate">
+    <constructor-arg ref="hiveSessionFactory" />
+  </bean>
+
+  <bean id="hiveSessionFactory" class="org.projectx.hive.session.FailoverHiveSessionFactoryFactoryBean">
+    <constructor-arg ref="hiveConnectionFactory" />
+    <property name="hostsString" value="${hive.thrift.cluster.hosts}" />
+    <property name="timeout" value="${hive.thrift.cluster.timeout}" />
+    <property name="connectionTestQuery" value="${hive.thrift.cluster.test.query}" />
+    <property name="connectionTestQueryTimeout" value="${hive.thrift.cluster.test.query.timeout}" />
+    <property name="numAttempts" value="${hive.thrift.cluster.failover.attempts}" />
+  </bean>
+
+  <bean id="hiveConnectionFactory" class="org.projectx.hive.connection.ManagedHiveConnectionFactory">
+    <constructor-arg ref="thriftSocketFactory" />
+    <constructor-arg ref="thriftProtocolFactory" />
+    <constructor-arg ref="hiveClientFactory" />
+  </bean>
+
+  <bean id="thriftSocketFactory" class="org.projectx.thrift.DefaultThriftSocketFactory" />
+  <bean id="thriftProtocolFactory" class="org.projectx.thrift.ConfigurableThriftProtocolFactory" />
+  <bean id="hiveClientFactory" class="org.projectx.hive.connection.DefaultHiveClientFactory" />
+</beans>
